@@ -1,38 +1,12 @@
-# create-svelte
+I'm seeing a waterfall effect when loading data on a child page, when that child page calls `await parent()` purely to access an auth token which is stored in `locals`.
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+I have a small reproduction example set up here: https://github.com/kevinrenskers/sk-loading-waterfall. Start up the server, navigate to http://127.0.0.1:5173/child and check the logs. You can see something like this:
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+```
+Starting A 1677925953894
+Starting B 1677925954228
 ```
 
-## Developing
+This is a waterfall effect: B only starts after A is complete, purely because the child page needs access to the token, stored in locals, via `await parent()`. If you remove that call in the child page's `+page.ts` file, you will see that both requests are now made at the same time.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+My question is how to prevent this waterfall effect from happening, when I need access to the token, stored in locals, in a child page?
